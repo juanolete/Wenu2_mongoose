@@ -65,6 +65,14 @@
 #define ACCMODE_8 0xE701 //Accumulation mode register.
 #define CONFIG2_8 0xEC01 //Configuration register used during PSM1.
 
+/*
+struct mgos_ade7858_event_data{
+    bool interrupt;
+};
+
+typedef void (*mgos_ade7858_event_t)(struct mgos_ade7858_event_data *);
+*/
+
 //funciones
 
 //init

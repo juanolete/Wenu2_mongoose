@@ -1,16 +1,28 @@
-author: mongoose-os
+author: Juan Millan <jjmillancas@gmail.com>
 type: lib
-description: An empty lib that does nothing
+description: ADE7858 SPI based energy meter
 version: 1.0
+platforms: esp8266
 
 sources:
   - src
-filesystem:
-  - fs
-config_schema:
+includes:
+  - include
 libs:
+  - origin: https://github.com/mongoose-os-libs/spi
+
+config_schema:
+  - ["ade7858","o", {title: "ade7858 energy meter"}]
+  - ["ade7858.cs_index","i", 0, {title: "spi.cs*_gpio index, 0, 1 or 2"}]
+  - ["ade7858.rst_pin", "i", 4, {title: "RST pin"}]
+  - ["ade7858.irq_pin", "i", 6, {title: "IRQ pin"}]
+  - ["spi.cs0_gpio", 5]
+
 
 tags:
   - c
+  - hw
+  - energy
+  - meter
 
 manifest_version: 2017-09-29
