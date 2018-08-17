@@ -1,0 +1,30 @@
+author: Juan Millan <jjmillancas@gmail.com>
+type: lib
+description: Ade7953 library traduction to C/C++ Mongoose OS. Original library created by Umar Kazmi, Crystal Lai, and Michael Klopfer, Ph.D. 
+version: 1.0
+
+sources:
+  - src
+  
+includes:
+  - include
+
+filesystem:
+  - fs
+
+config_schema:
+  - ["spi.enable", true]
+
+libs:
+  - name: ade7953
+  - origin: https://github.com/mongoose-os-libs/arduino-compat
+  - origin: https://github.com/mongoose-os-libs/arduino-wire
+  - origin: https://github.com/mongoose-os-libs/arduino-spi
+
+tags:
+  - c
+  - js
+  - arduino
+  - ADE7953
+
+manifest_version: 2017-09-29

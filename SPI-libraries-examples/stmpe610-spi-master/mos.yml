@@ -1,0 +1,26 @@
+author: Pim van Pelt <pim@google.com>
+type: lib
+description: STMPE610 SPI based touch screen
+version: 1.0
+platforms: [ esp8266, esp32 ]
+
+sources:
+  - src
+includes:
+  - include
+libs:
+  - origin: https://github.com/mongoose-os-libs/spi
+
+config_schema:
+  - ["stmpe610", "o", {title: "STMPE610 TouchScreen"}]
+  - ["stmpe610.cs_index", "i", 0, {title: "spi.cs*_gpio index, 0, 1 or 2"}]
+  - ["spi.cs0_gpio", 16 ]
+  - ["stmpe610.irq_pin", "i", 4, {title: "IRQ pin"}]
+  - ["stmpe610.orientation", "i", 0, {title: "Set orientation of STMPE610 (+1 to flip X, +2 to flip Y, +4 to swap X and Y)"}]
+
+
+tags:
+  - c
+  - hw
+
+manifest_version: 2017-09-29
