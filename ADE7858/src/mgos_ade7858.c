@@ -20,7 +20,7 @@ static void ade7858_irq(){
 */
 
 //read register
-static uint8_t ade7858_spi_read_register_8(uint16_t reg) {
+uint8_t ade7858_spi_read_register_8(uint16_t reg) {
   struct mgos_spi *spi = mgos_spi_get_global();
   if (!spi) {
     LOG(LL_ERROR,("Cannot get global SPI bus"));
@@ -48,7 +48,7 @@ static uint8_t ade7858_spi_read_register_8(uint16_t reg) {
   }
   return rx_data;
 }
-static uint16_t ade7858_spi_read_register_16(uint16_t reg) {
+uint16_t ade7858_spi_read_register_16(uint16_t reg) {
   struct mgos_spi *spi = mgos_spi_get_global();
   if (!spi) {
     LOG(LL_ERROR,("Cannot get global SPI bus"));
@@ -76,7 +76,7 @@ static uint16_t ade7858_spi_read_register_16(uint16_t reg) {
   }
   return rx_data;
 }
-static uint32_t ade7858_spi_read_register_32(uint16_t reg) {
+uint32_t ade7858_spi_read_register_32(uint16_t reg) {
   struct mgos_spi *spi = mgos_spi_get_global();
   if (!spi) {
     LOG(LL_ERROR,("Cannot get global SPI bus"));
@@ -106,7 +106,7 @@ static uint32_t ade7858_spi_read_register_32(uint16_t reg) {
 }
 
 //write register
-static void ade7858_spi_write_register_8(uint16_t reg, uint8_t val){
+void ade7858_spi_write_register_8(uint16_t reg, uint8_t val){
   struct mgos_spi *spi = mgos_spi_get_global();
 
   if (!spi) {
@@ -133,7 +133,7 @@ static void ade7858_spi_write_register_8(uint16_t reg, uint8_t val){
     return;
   }
 }
-static void ade7858_spi_write_register_16(uint16_t reg, uint16_t val){
+void ade7858_spi_write_register_16(uint16_t reg, uint16_t val){
   struct mgos_spi *spi = mgos_spi_get_global();
 
   if (!spi) {
@@ -161,7 +161,7 @@ static void ade7858_spi_write_register_16(uint16_t reg, uint16_t val){
     return;
   }
 }
-static void ade7858_spi_write_register_32(uint16_t reg, uint32_t val){
+void ade7858_spi_write_register_32(uint16_t reg, uint32_t val){
   struct mgos_spi *spi = mgos_spi_get_global();
 
   if (!spi) {
@@ -191,7 +191,8 @@ static void ade7858_spi_write_register_32(uint16_t reg, uint32_t val){
     return;
   }
 }
-static void ade7858_spi_write_init(void){
+
+void ade7858_spi_write_init(void){
   ade7858_spi_write_register_8(0xEBFF, 0xFF);
   mgos_msleep(100);
   ade7858_spi_write_register_8(0xEBFF, 0xFF);
@@ -200,8 +201,67 @@ static void ade7858_spi_write_init(void){
   mgos_msleep(100);
 }
 
+long b24tolong(uint32_t val){
+  if (val & 0x00800000){
+     return (long)(0xFF000000 | val)
+  } else {
+    return (long)val;
+  }
+}
+
+//For Phase A measure
+long mgos_ade7858_getAVoltage(void){
+  return b24tolong(ade7858_spi_read_register_32(AVRMS_24));
+}
+long mgos_ade7858_getACurrent(void){
+  return b24tolong(ade7858_spi_read_register_32(AIRMS_24));
+}
+long mgos_ade7858_getAActiveEnergy(void){
+  return (long)(ade7858_spi_read_register_32(AWATTHR_32));
+}
+long mgos_ade7858_getAReactiveEnergy(void){
+  return (long)(ade7858_spi_read_register_32(AVARHR_32));
+}
+long mgos_ade7858_getAAparentEnergy(void){
+  return (long)(ade7858_spi_read_register_32(AVAHR_32));
+}
+
+//For Phase B measure
+long mgos_ade7858_getBVoltage(void){
+  return b24tolong(ade7858_spi_read_register_32(BVRMS_24));
+}
+long mgos_ade7858_getBCurrent(void){
+  return b24tolong(ade7858_spi_read_register_32(BIRMS_24));
+}
+long mgos_ade7858_getBActiveEnergy(void){
+  return (long)(ade7858_spi_read_register_32(BWATTHR_32));
+}
+long mgos_ade7858_getBReactiveEnergy(void){
+  return (long)(ade7858_spi_read_register_32(BVARHR_32));
+}
+long mgos_ade7858_getBAparentEnergy(void){
+  return (long)(ade7858_spi_read_register_32(BVAHR_32));
+}
+
+//For Phase C measure
+long mgos_ade7858_getCVoltage(void){
+  return b24tolong(ade7858_spi_read_register_32(CVRMS_24));
+}
+long mgos_ade7858_getCCurrent(void){
+  return b24tolong(ade7858_spi_read_register_32(CIRMS_24));
+}
+long mgos_ade7858_getCActiveEnergy(void){
+  return (long)(ade7858_spi_read_register_32(CWATTHR_32));
+}
+long mgos_ade7858_getCReactiveEnergy(void){
+  return (long)(ade7858_spi_read_register_32(CVARHR_32));
+}
+long mgos_ade7858_getCAparentEnergy(void){
+  return (long)(ade7858_spi_read_register_32(CVAHR_32));
+}
+
 //init
-bool mgos_ade7858_init(void){
+void mgos_ade7858_init(void){
   mgos_gpio_set_mode(mgos_sys_config_get_ade7858_rst_pin(), MGOS_GPIO_MODE_OUTPUT);
   mgos_gpio_set_mode(mgos_sys_config_get_ade7858_irq_pin(), MGOS_GPIO_MODE_INPUT);
   mgos_gpio_set_pull(mgos_sys_config_get_ade7858_irq_pin(), MGOS_GPIO_PULL_UP);
@@ -215,8 +275,6 @@ bool mgos_ade7858_init(void){
   ade7858_spi_write_register_32(STATUS1_32, 0x00000000);
   ade7858_spi_write_register_32(STATUS0_32, 0x00200000);
   
-  // FInalmente, iniciar todos los registros
-  // ver DIgital Signal Processor section en datasheet
   //Iniciar Gain registers
   ade7858_spi_write_register_32(AIGAIN_24, 0x00000001);
   ade7858_spi_write_register_32(BIGAIN_24, 0x00000001);
@@ -224,60 +282,49 @@ bool mgos_ade7858_init(void){
   ade7858_spi_write_register_32(AVGAIN_24, 0x00000001);
   ade7858_spi_write_register_32(BVGAIN_24, 0x00000001);
   ade7858_spi_write_register_32(CVGAIN_24, 0x00000001);
-  ade7858_spi_read_register_16(Gain_16, 0x0000);
-  ade7858_spi_read_register_32(AVAGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(BVAGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(CVAGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(AWGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(BWGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(CWGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(AVARGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(BVARGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(CVARGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(AFWGAIN_24, 0x00000001);
-  //Iniciar WTHR0 y WTHR1
-  ade7858_spi_read_register_32(AFWGAIN_24, 0x00000001);
-  ade7858_spi_read_register_32(AFWGAIN_24, 0x00000001);
+  ade7858_spi_write_register_16(Gain_16, 0x0000);
+  ade7858_spi_write_register_32(AVAGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(BVAGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(CVAGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(AWGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(BWGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(CWGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(AVARGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(BVARGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(CVARGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(AFWGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(AFWGAIN_24, 0x00000001);
+  ade7858_spi_write_register_32(AFWGAIN_24, 0x00000001);
 
+  //Iniciate all RAM registers
+  ade7858_spi_read_register_32(WTHR0_24, 0x007FFFFF); //max value
+  ade7858_spi_read_register_32(WTHR1_24, 0x007FFFFF); //max value
+  ade7858_spi_read_register_32(VARTHR0_24,0x007FFFFF); //max value
+  ade7858_spi_read_register_32(VARTHR1_24,0x007FFFFF); //max value
+  ade7858_spi_read_register_32(VATHR0_24,0x007FFFFF); //max value
+  ade7858_spi_read_register_32(VATHR1_24,0x007FFFFF);  //max value
+  ade7858_spi_write_register_16(CF1DEN_16, 0x03E8); //CF1DEN = d1000
+  ade7858_spi_write_register_16(CF2DEN_16, 0x03E8); //CF2DEN = d1000
+  ade7858_spi_write_register_16(CF3DEN_16, 0x03E8); //CF3DEN = d1000
+  ade7858_spi_write_register_32(VNOM_24, 0x00001A4F); //VNOM = d6735
+  //Write protection
+  ade7858_spi_write_register_8(0xE7FE, 0xAD);
+  ade7858_spi_write_register_8(0xE7E3, 0x80);
   //DSP run = 1
   ade7858_spi_write_register_16(Run_16, 0x0001);
-  //Iniciate all RAM registers
 
-  //Iniciar AIGAIN, BIGAIN, CIGAIN, NIGAIN
-  //Start DSP setting run = 1
-  //Iniciar all  RAM registers. 3 veces
-  //Iniciar todos los registros menos CFMODE
-  //Leer todos los registros
-  //xWATTHR, xFWATTHR, xVARHR, xFVARFR y xVAHR
-  //Clear bit CF1DIS, CF2DIS y CF3DIS in CFMODE
-  //escribir 0xAD to 8bit 0xE7FE register
-  //escribir 0x80 to 8bit 0xE7E3
-  //leer todos los datos de RAM register
-  //asegurarse de que fueron bien escritos
-  //si alguno no fue bien escrito:
-  //    escribir 0xAD to 8bit 0xE7FE register
-  //    escribir 0x00 to 8bit 0xE7E3 register
-  //    reinicializar los registros
-  //    escribir los registros 3 veces
-  //    volver a habilitar write proteccion:
-  //    escribir 0xAD to 8bit 0xE7FE
-  //    escribir 0x80 to 8bit 0xE7E3
+  //First read, to clear registers
+  long WATTHR = mgos_ade7858_getAActiveEnergy();
+  WATTHR = mgos_ade7858_getBActiveEnergy();
+  WATTHR = mgos_ade7858_getCActiveEnergy();
+
+  long VARHR = mgos_ade7858_getAAparentEnergy();
+  VARHR = mgos_ade7858_getBAparentEnergy();
+  VAHR = mgos_ade7858_getCReactiveEnergy(); 
+
+  long VAHR = mgos_ade7858_getAReactiveEnergy();
+  VAHR = mgos_ade7858_getBReactiveEnergy();
+  VARHR = mgos_ade7858_getCAparentEnergy();
   
-
-  //CONFIGURAR
-
-
-}
-
-
-//get Phase A Voltage RMS
-//get Phase A Current RMS
-//get Phase A Active Energy
-//get Phase A Reactive Energy
-//get Phase A Apparent Energy
-//get Phase A Peak Current
-//get Phase A Peak Voltage
-
-bool mgos_empty_init(void) {
-  return true;
+  //clear bits 9, 10, 11 to 0 de CFMODE register
 }

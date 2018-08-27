@@ -133,16 +133,34 @@ struct mgos_ade7858_event_data{
 typedef void (*mgos_ade7858_event_t)(struct mgos_ade7858_event_data *);
 */
 
-//funciones
-
 //init
+void mgos_ade7858_init(void);
+//For Phase A measure
+long mgos_ade7858_getAVoltage(void);
+long mgos_ade7858_getACurrent(void);
+long mgos_ade7858_getAActiveEnergy(void);
+long mgos_ade7858_getAReactiveEnergy(void);
+long mgos_ade7858_getAAparentEnergy(void);
+//For Phase B measure
+long mgos_ade7858_getBVoltage(void);
+long mgos_ade7858_getBCurrent(void);
+long mgos_ade7858_getBActiveEnergy(void);
+long mgos_ade7858_getBReactiveEnergy(void);
+long mgos_ade7858_getBAparentEnergy(void);
+//For Phase C measure
+long mgos_ade7858_getCVoltage(void);
+long mgos_ade7858_getCCurrent(void);
+long mgos_ade7858_getCActiveEnergy(void);
+long mgos_ade7858_getCReactiveEnergy(void);
+long mgos_ade7858_getCAparentEnergy(void);
+//read register
+uint8_t ade7858_spi_read_register_8(uint16_t reg);
+uint16_t ade7858_spi_read_register_16(uint16_t reg);
+uint32_t ade7858_spi_read_register_32(uint16_t reg);
+//write register
+void ade7858_spi_write_register_8(uint16_t reg, uint8_t val);
+void ade7858_spi_write_register_16(uint16_t reg, uint16_t val);
+void ade7858_spi_write_register_32(uint16_t reg, uint32_t val);
 
-//get Phase A Voltage RMS
-//get Phase A Current RMS
-//get Phase A Active Energy
-//get Phase A Reactive Energy
-//get Phase A Apparent Energy
-//get Phase A Peak Current
-//get Phase A Peak Voltage
-
+long b24tolong(uint32_t val);
 #endif // __ADE7858_
